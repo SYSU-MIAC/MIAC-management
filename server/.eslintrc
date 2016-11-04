@@ -1,0 +1,10 @@
+{
+  "extends": "airbnb-base",
+  "parser": "babel-eslint",
+  "rules": {
+    "generator-star-spacing": "off",
+    "require-yield": "off",
+    // 允许函数改变参数的值
+    "no-param-reassign": 0
+  }
+}
