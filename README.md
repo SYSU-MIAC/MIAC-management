@@ -4,7 +4,7 @@
 
 ```bash
 $ npm install # install dependencies
-$ sudo npm install eslint # install eslint for linting
+$ sudo npm install eslint -g # install global eslint for linting
 $ npm run lint # lint your JavaScript code
   # front end
 $ gulp # automatically build
