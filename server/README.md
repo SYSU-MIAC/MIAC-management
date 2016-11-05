@@ -39,7 +39,7 @@ export default {
 │   ├── debug-xx-xx.log
 │   └── error-xx-xx.log
 ├── package.json
-├── server                  # compiled code
+├── dist                    # compiled code
 │   └── *
 ├── src
 │   ├── config              # configuration
