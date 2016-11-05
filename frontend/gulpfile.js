@@ -12,6 +12,7 @@ const merge = require('merge-stream');
 const spritesmith = require('gulp.spritesmith');
 const csso = require('gulp-csso');
 const browserSync = require('browser-sync');
+const plumber = require('gulp-plumber');
 const path = require('path');
 
 const staticFilePath = {
@@ -26,13 +27,15 @@ const staticFilePath = {
 };
 
 gulp.task('html', () => gulp.src(staticFilePath.htmlSrc)
+        .pipe(plumber())
         .pipe(pug())
         .pipe(gulp.dest(staticFilePath.htmlDst))
         .pipe(browserSync.stream())
 );
 
 gulp.task('styles', () => gulp.src(staticFilePath.cssSrc)
-        .pipe(sass({ outputStyle: 'expanded' }))
+        .pipe(plumber())
+        .pipe(sass({ outputStyle: 'expanded' }).on('error', sass.logError))
         .pipe(autoprefixer('last 2 version'))
         .pipe(gulp.dest(staticFilePath.cssDst))
         .pipe(rename({ suffix: '.min' }))
@@ -42,6 +45,7 @@ gulp.task('styles', () => gulp.src(staticFilePath.cssSrc)
 );
 
 gulp.task('scripts', () => gulp.src(staticFilePath.jsSrc)
+      .pipe(plumber())
       .pipe(rename({ suffix: '.min' }))
       .pipe(uglify())
       .pipe(gulp.dest(staticFilePath.jsDst))
@@ -71,12 +75,13 @@ gulp.task('sprite', () => {
   // return merge(imgStream, cssStream);
 
   return gulp.src(staticFilePath.imgSrc)
-       .pipe(cache(imagemin({ optimizationLevel: 5, progressive: true, interlaced: true })))
-       .pipe(gulp.dest(staticFilePath.imgDst))
-       .pipe(browserSync.stream());
+        .pipe(plumber())
+        .pipe(cache(imagemin({ optimizationLevel: 5, progressive: true, interlaced: true })))
+        .pipe(gulp.dest(staticFilePath.imgDst))
+        .pipe(browserSync.stream());
 });
 
-gulp.task('sync', () => 
+gulp.task('sync', () =>
   browserSync.init({
     server: {
       baseDir: path.join('..', 'static'),

@@ -3,6 +3,7 @@
   "parser": "babel-eslint",
   "rules": {
     // 允许函数改变参数的值
-    "no-param-reassign": 0
+    "no-param-reassign": 0,
+    "no-console": 0
   }
 }
