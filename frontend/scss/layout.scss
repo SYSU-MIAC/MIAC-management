@@ -1,0 +1,64 @@
+//navigation bar
+header#header {
+    width: 100%;
+    background-color: #FF897D;
+    position: relative;
+}
+
+.miac-logo img {
+    height: 40px;
+    width: 50px;
+    position: absolute;
+    left: 5%;
+    top: 50%;
+    margin-top: -20px;
+}
+
+nav#left-top-nav {
+    width: 300px;
+    background-color: #FF897D;
+    position: absolute;
+    left: 10%;
+    a {
+        padding: 0;
+    }
+}
+
+nav#left-top-nav .is-active:after {
+    content: "";
+    width: 100px;
+    height: 2px;
+    display: block;
+    position: absolute;
+    bottom: 0;
+    background-color: #FBF7F0;
+    opacity: 1;
+}
+
+nav#personal-info {
+    line-height: 64px;
+    position: absolute;
+    left: 75%;
+    height: 100%;
+    width: 300px;
+    img {
+        height: 30px;
+        width: 30px;
+    }
+}
+
+nav a {
+    text-align: center;
+    width: 100px;
+    height: 100%;
+    line-height: 64px;
+    color: white;
+    opacity: 0.65;
+}
+
+nav a:hover {
+    opacity: 1;
+}
+
+
+
