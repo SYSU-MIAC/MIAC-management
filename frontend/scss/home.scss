@@ -1,1 +1,63 @@
 
+.pictures-slide {
+    height: 400px;
+    width: 600px;
+    overflow: hidden;
+    position: relative;
+    margin: auto;
+    #left-arrow, #right-arrow {
+        height: 100px;
+        width: 40px;
+        position: absolute;
+        top: 50%;
+        margin-top: -50px;
+        cursor: pointer;
+        i {
+            margin-top: 41px;
+            opacity: 0.5;
+        }
+    }
+    #left-arrow {
+        left: 0;
+    }
+    #right-arrow {
+        right: 0;
+        text-align: right;
+    }
+    #left-arrow:hover, #right-arrow:hover {
+        background-color: white;
+        opacity: 0.2;
+    }
+}
+
+.slides {
+    height: 400px;
+    width: 598px;
+}
+
+
+nav.picture-navigation {
+    height: 20px;
+    width: 130px;
+    position: absolute;
+    bottom: 10px;
+    right: 0;
+    li {
+        height: 15px;
+        width: 15px;
+        border-radius: 50%;
+        margin-right: 15px;
+        list-style: none;
+        float: left;
+        background-color: #FFF;
+        cursor: pointer;
+    }
+    li.is-checked {
+        background-color: #BBBBBB;
+    }
+}
+
+
+
+//image shuffling
+
