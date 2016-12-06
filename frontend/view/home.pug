@@ -1,0 +1,22 @@
+extends layout.pug
+
+block head
+    link(rel='stylesheet' href='./css/home.min.css')
+    script(src='/js/changeImage.min.js' type='text/javascript')
+
+block body
+    .pictures-slide
+        .pictures-container
+            img(src='images/picture1.jpg' class="slides" alt='pic1')
+            img(src='images/picture2.jpg' class="slides" alt='pic2')
+            img(src='images/picture3.jpg' class="slides" alt='pic3')
+        nav.picture-navigation
+            ul
+                li#slide1-button.slides-button.is-checked
+                li#slide2-button.slides-button
+                li#slide3-button.slides-button
+        #left-arrow
+            i(class="material-icons" role='presentation') navigate_before
+        #right-arrow
+            i(class="material-icons" role='presentation') navigate_next
+    .article-box.mdl-grid
