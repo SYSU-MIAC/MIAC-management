@@ -13,3 +13,4 @@ $ npm run dev # development mode
 $ npm run build # compile the code under the `src` directory using babel
 $ npm run serve # run the compiled code
 ```
+.

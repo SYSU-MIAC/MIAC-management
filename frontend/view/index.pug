@@ -1,8 +1,24 @@
-extends layout
-
-block body
-  #main
-    h1 MIAC
-
-  link(type='text/css', rel='stylesheet', href='./css/exm.min.css')
-  script(src='./js/exm.min.js' type='text/javascript')
+html
+  head
+    meta(charset="utf-8")
+    link(type='text/css', rel='stylesheet', href='./css/enter.min.css')
+    link(rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons")
+    link(rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.indigo-pink.min.css")
+    script(defer src="https://code.getmdl.io/1.2.1/material.min.js")
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.js' type='text/javascript')
+  body
+    canvas#Mycanvas
+    script(src='./js/particles.min.js' type='text/javascript')
+    h1.title MIAC
+    .enter 
+       button.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect Click me and Enter
+    .login
+      .login_panel
+        h1 login
+        form(method='post')
+          div.username
+            input(class='username' type='text' name='username' placeholder='Username')
+          div.password
+            input(class='password' type='password' name='password' placeholder='Password')
+          div.button
+            input(class='submit' type='submit' value='Sign in')
