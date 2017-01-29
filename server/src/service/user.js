@@ -1,11 +1,19 @@
 const db = require('../models');
 
+const user = db.user;
+
+
 async function createUser() {
-  db.user.create({
+  return user.create({
     name: 'xiaoming',
   });
 }
 
+async function findUserById(id) {
+  return user.findOne({ id });
+}
+
 module.exports = {
   createUser,
+  findUserById,
 };

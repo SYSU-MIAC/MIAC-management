@@ -5,8 +5,8 @@ module.exports = {
   static: path.resolve(__dirname, 'public'),
   db: {
     host: 'localhost',
-    username: 'root',
-    password: '',
+    username: 'miac',
+    password: 'miac',
     database: 'miac',
     port: 27017,
   },
