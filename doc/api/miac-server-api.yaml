@@ -1,0 +1,363 @@
+---
+swagger: "2.0"
+info:
+  description: "This is the MIAC management API server"
+  version: "beta"
+  title: "MIAC management API"
+  contact:
+    url: "https://github.com/SYSU-MIAC/MIAC-management/issues"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "127.0.0.1"
+basePath: "/api"
+tags:
+- name: "article"
+  description: "Operations about articles"
+- name: "user"
+  description: "Operations about user"
+- name: "homework"
+  description: "Operations about user"
+- name: "administrator"
+  description: "administrator only"
+  externalDocs:
+    description: "Find out more about this project"
+    url: "https://github.com/SYSU-MIAC/MIAC-management"
+schemes:
+- "http"
+paths:
+  /hw:
+    post:
+      tags:
+      - "homework"
+      - "administrator"
+      summary: "Add a new homework"
+      description: "only administrator can create new homework"
+      operationId: "addHomework"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - name: "title"
+          in: "formData"
+          type: "string"
+      responses:
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "homework"
+  /hw/{title}:
+    post:
+      tags:
+      - "homework"
+      summary: "Hand in homework"
+      description: ""
+      operationId: "postHomework"
+      parameters:
+        - name: "title"
+          in: "path"
+          description: "title of homework"
+          required: true
+          type: "string"
+        - name: "file"
+          in: "formData"
+          required: true
+          type: "file"
+      responses:
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "homework"
+    delete:
+      tags:
+      - "homework"
+      - "administrator"
+      summary: "Delete a homework by title"
+      description: "only administrator can delete a homework"
+      operationId: "deleteHomework"
+      parameters:
+        - name: "title"
+          in: "path"
+          description: "title of homework"
+          required: true
+          type: "string"
+      responses:
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "homework"
+  /hw/{title}/comment/{userId}:
+    post:
+      tags:
+      - "homework"
+      summary: "administrator post comment to club member"
+      operationId: "commentHomework"
+      produces:
+      - "application/json"
+      parameters:
+        - name: "title"
+          in: "path"
+          description: "title of homework"
+          required: true
+          type: "string"
+        - name: "userId"
+          in: "path"
+          description: "id of administrator"
+          required: true
+          type: "string"
+        - name: "text"
+          in: "formData"
+          required: true
+          type: "string"
+      responses:
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "homework"
+  /article:
+    post:
+      tags:
+      - "article"
+      summary: "Add a new article"
+      description: ""
+      operationId: "addArticle"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "article object that needs to be added"
+        required: true
+        schema:
+          $ref: "#/definitions/Article"
+      responses:
+        405:
+          description: "Invalid input"
+      x-swagger-router-controller: "article"
+  /article/{articleId}:
+    get:
+      tags:
+      - "article"
+      summary: "Find article by ID"
+      description: "Returns a single article"
+      operationId: "getArticleById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "articleId"
+        in: "path"
+        description: "ID of article to return"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Article"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "article not found"
+      x-swagger-router-controller: "article"
+    put:
+      tags:
+      - "article"
+      summary: "Updates a article"
+      description: "only the author of the article or the administrator can update it"
+      operationId: "updateArticle"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "articleId"
+        in: "path"
+        description: "ID of article that needs to be updated"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Updated user object"
+        required: true
+        schema:
+          $ref: "#/definitions/Article"
+      responses:
+        405:
+          description: "Invalid input"
+      x-swagger-router-controller: "article"
+    delete:
+      tags:
+      - "article"
+      summary: "Deletes a article"
+      description: "only the author of the article or the administrator can delete it"
+      operationId: "deleteArticle"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "articleId"
+        in: "path"
+        description: "article id to delete"
+        required: true
+        type: "string"
+      responses:
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "article not found"
+      x-swagger-router-controller: "article"
+  /article/{articleId}/comment:
+    post:
+      tags:
+      - "article"
+      summary: "comment to an article"
+      description: ""
+      operationId: "commentArticle"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "articleId"
+        in: "path"
+        description: "article id"
+        required: true
+        type: "string"
+      responses:
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "article not found"
+      x-swagger-router-controller: "article"
+  /user:
+    post:
+      tags:
+      - "user"
+      - "administrator"
+      summary: "Create user"
+      description: "This can only be done by the administrator."
+      operationId: "createUser"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created user object"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "User"
+  /user/login:
+    get:
+      tags:
+      - "user"
+      summary: "Logs user into the system"
+      description: ""
+      operationId: "loginUser"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "query"
+        description: "The user name for login"
+        required: true
+        type: "string"
+      - name: "password"
+        in: "query"
+        description: "The password for login in encryted text"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "string"
+        400:
+          description: "Invalid username/password supplied"
+      x-swagger-router-controller: "User"
+  /user/logout:
+    get:
+      tags:
+      - "user"
+      summary: "Logs out current logged in user session"
+      description: ""
+      operationId: "logoutUser"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "User"
+  /user/{id}:
+    get:
+      tags:
+      - "user"
+      summary: "Get user by user id"
+      description: ""
+      operationId: "getUserByName"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The name that needs to be fetched."
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/User"
+        400:
+          description: "Invalid username supplied"
+        404:
+          description: "User not found"
+      x-swagger-router-controller: "User"
+    put:
+      tags:
+      - "user"
+      summary: "Updated user"
+      description: "This can only be done by the logged in user."
+      operationId: "updateUser"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "user that need to be updated"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Updated user object"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        400:
+          description: "Invalid user supplied"
+        404:
+          description: "User not found"
+      x-swagger-router-controller: "User"
+definitions:
+  User:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      nickname:
+        type: "string"
+      password:
+        type: "string"
+      email:
+        type: "string"
+      github:
+        type: "string"
+      permission:
+        type: "integer"
+        format: "int32"
+  Article:
+    type: "object"
+    properties:
+      title:
+        type: "string"
+      text:
+        type: "string"
