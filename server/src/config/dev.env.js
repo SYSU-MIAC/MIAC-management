@@ -2,11 +2,11 @@ const path = require('path');
 
 module.exports = {
   port: 3000,
-  static: path.resolve(__dirname, 'public'),
+  static: path.join(__dirname, '..', '..', '..', 'static'),
   db: {
     host: 'localhost',
-    username: 'root',
-    password: '',
+    username: 'miac',
+    password: 'miac',
     database: 'miac',
     port: 27017,
   },
