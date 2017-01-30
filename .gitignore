@@ -1,0 +1,5 @@
+.DS_Store
+npm-debug.log
+node_module
+src/config/dev.env.js
+.vscode
