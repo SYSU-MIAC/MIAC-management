@@ -2,8 +2,8 @@ const Router = require('koa-router');
 const compose = require('koa-compose');
 const serve = require('koa-static');
 const bodyParser = require('koa-bodyparser');
-const path = require('path');
 const userCtrl = require('./user');
+const config = require('../config');
 
 const router = new Router();
 
@@ -22,5 +22,5 @@ module.exports = () => compose([
   getBodyParser(),
   router.routes(),
   router.allowedMethods(),
-  serve(path.join(__dirname, '..', '..', '..', 'static')),
+  serve(config.static),
 ]);
