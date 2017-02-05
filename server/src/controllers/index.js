@@ -7,6 +7,8 @@ const session = require('koa-generic-session');
 const MongooseStore = require('koa-session-mongoose');
 
 const userCtrl = require('./user');
+const hwCtrl = require('./homework');
+const articleCtrl = require('./article');
 const { sendData, handleError } = require('../utils');
 const config = require('../config');
 const db = require('../models');
@@ -56,6 +58,8 @@ function getSession() {
 function init(router) {
   router.all('/*', setRole);
   userCtrl(router);
+  hwCtrl(router);
+  articleCtrl(router);
 }
 
 async function setRole(ctx, next) {

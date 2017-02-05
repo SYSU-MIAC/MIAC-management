@@ -2,14 +2,17 @@ const schema = {
   id: {  // login id
     type: String,
     required: true,
+    unique: true,
   },
   password: {
     type: String,
     required: true,
   },
   permission: {
-    type: String,
+    type: Number,
     default: 1,
+    min: 1,
+    max: 3,
   },
   nickname: {
     type: String,
@@ -40,14 +43,17 @@ const schema = {
         required: true,
       },
       comment: {  // comments
-        text: {  // comment's content
-          type: String,
-          required: true,
-        },
-        author: {  // who comment
-          type: String,
-          required: true,
-        },
+        type: [{
+          text: {  // comment's content
+            type: String,
+            required: true,
+          },
+          author: {  // who comments
+            type: String,
+            required: true,
+          },
+        }],
+        default: [],
       },
     }],
     default: [],

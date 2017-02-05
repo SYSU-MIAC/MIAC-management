@@ -10,12 +10,12 @@ const userRtr = new Router({
   prefix: '/user',
 });
 
-userRtr.post('/', createUser);
+userRtr.post('/', authService.requireAdmin, createOneUser);
 userRtr.get('/login', login);
 userRtr.get('/logout', authService.requireLogin, logout);
 userRtr.param('id', parseUser);
-userRtr.get('/:id', getUser);
-userRtr.put('/:id', authService.requireLogin, updateUser);
+userRtr.get('/:id', getOneUser);
+userRtr.put('/:id', authService.requireLogin, updateOneUser);
 
 function getMD5(data) {
   return crypto.createHash('md5').update(data).digest('hex');
@@ -33,7 +33,7 @@ async function parseUser(id, ctx, next) {
   // TODO: id 合法性检验
   let user = null;
   try {
-    user = await userService.findUserById(id);
+    user = await userService.getOneUser(id);
   } catch (e) {
     return handleError(ctx, e, 'DATABASE_QUERY_ERROR', 'Failed to execute query on database');
   }
@@ -51,7 +51,7 @@ const userAvailableProps = [
   'github',
   'permission',
 ];
-async function getUser(ctx) {
+async function getOneUser(ctx) {
   const dataToSend = _.pick(ctx.paramsData.user, userAvailableProps);
   recordAction(ctx, `查询用户 ${ctx.paramsData.user.id} 的信息`);
   return sendData(ctx, dataToSend, 'OK', 'Got user information successfully');
@@ -64,7 +64,7 @@ async function login(ctx) {
   const { id, password } = ctx.query;
   let user = null;
   try {
-    user = await userService.findUserById(id);
+    user = await userService.getOneUser(id);
   } catch (e) {
     return handleError(ctx, e, 'DATABASE_QUERY_ERROR', 'Failed to execute query on database');
   }
@@ -115,18 +115,17 @@ const fieldsOnCreateUser = [
   'github',
   'email',
 ];
-async function createUser(ctx) {
+async function createOneUser(ctx) {
   const newUser = _.pick(ctx.request.body, fieldsOnCreateUser);
 
   if (!await isValidNewUser(ctx, newUser)) return;
 
   refactorUser(newUser);
   try {
-    await userService.createUser(newUser);
+    await userService.createOneUser(newUser);
   } catch (e) {
     return handleCreateOrUpdateError(ctx, e);
   }
-  await addLoginSession(ctx, await userService.findUserById(newUser.id));
   recordAction(ctx, '注册');
   return sendData(ctx, {}, 'OK', 'Registered successfully');
 
@@ -149,7 +148,7 @@ const fieldsOnUpdateUser = [
   'headimg',
   'email',
 ];
-async function updateUser(ctx) {
+async function updateOneUser(ctx) {
   const newUser = _.pick(ctx.request.body, fieldsOnUpdateUser);
 
   if (!await isValidNewUser(ctx, newUser)) return;
@@ -164,7 +163,7 @@ async function updateUser(ctx) {
 
   let result = null;
   try {
-    result = await userService.updateUser(id, newUser);
+    result = await userService.updateOneUser(id, newUser);
   } catch (e) {
     return handleCreateOrUpdateError(ctx, e);
   }
