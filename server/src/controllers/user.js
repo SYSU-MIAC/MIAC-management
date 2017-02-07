@@ -35,10 +35,10 @@ async function parseUser(id, ctx, next) {
   try {
     user = await userService.getOneUser(id);
   } catch (e) {
-    return handleError(ctx, e, 'DATABASE_QUERY_ERROR', 'Failed to execute query on database');
+    return handleError(ctx, e, 'DATABASE_QUERY_ERROR');
   }
   if (user === null) {
-    return sendData(ctx, {}, 'USER_NOT_FOUND', 'User not found', 404);
+    return sendData(ctx, {}, 'NOT_FOUND', 'User not found', 404);
   }
   ctx.paramsData.user = user;
   await next();
@@ -66,7 +66,7 @@ async function login(ctx) {
   try {
     user = await userService.getOneUser(id);
   } catch (e) {
-    return handleError(ctx, e, 'DATABASE_QUERY_ERROR', 'Failed to execute query on database');
+    return handleError(ctx, e, 'DATABASE_QUERY_ERROR');
   }
 
   if (user === null) {
@@ -105,7 +105,7 @@ async function handleCreateOrUpdateError(ctx, e) {
     // TODO
     return sendData(ctx, e, 'INVALID_VALUE', 'Invalid field value', 400);
   }
-  return handleError(ctx, e, 'DATABASE_MODIFICATION_ERROR', 'Failed to perform insert or update on batabase');
+  return handleError(ctx, e, 'DATABASE_MODIFICATION_ERROR');
 }
 
 const fieldsOnCreateUser = [

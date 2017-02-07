@@ -4,6 +4,10 @@ const fileService = require('./file');
 const homework = db.homework;
 const user = db.user;
 
+async function getOneHomework(title) {
+  return homework.find({ title, deleted: false }).exec();
+}
+
 async function createOneHomework(newHomework) {
   return homework.create(newHomework);
 }
@@ -29,6 +33,7 @@ async function getAllComments() {
 }
 
 module.exports = {
+  getOneHomework,
   createOneHomework,
   deleteOneHomework,
   handInOneHomework,

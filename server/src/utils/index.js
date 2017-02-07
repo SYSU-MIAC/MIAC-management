@@ -33,6 +33,11 @@ async function sendData(ctx, data, status = 'OK', msg = 'Success', statusCode = 
   };
 }
 
+const statusToMsg = {
+  DATABASE_QUERY_ERROR: 'Failed to execute query on database',
+  DATABASE_MODIFICATION_ERROR: 'Failed to perform insert or update on batabase',
+};
+
 /**
  * @description 服务器内部出错
  *
@@ -43,9 +48,12 @@ async function sendData(ctx, data, status = 'OK', msg = 'Success', statusCode = 
  * @param  {Number}    [statusCode]  HTTP 状态码, 默认 500
  * @author 陈宇翔
  */
-async function handleError(ctx, e, status = 'UNKNOWN_ERROR', msg = 'Unknown Error', statusCode = 500) {
+async function handleError(ctx, e, status = 'UNKNOWN_ERROR', msg = '', statusCode = 500) {
   error.error('Internal Server Error :');
   error.error(e);
+  if (msg.length === 0) {
+    msg = statusToMsg[status] || 'Unknown Error';
+  }
   let stack = e.stack;
   if (process.env.NODE_ENV === 'production') {
     stack = undefined;

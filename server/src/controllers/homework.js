@@ -16,7 +16,16 @@ hwRtr.post('/:title', authService.requireLogin, handInOneHomework);
 hwRtr.post('/:title/comment/:userId', authService.requireAdmin, adminCommentOnOneUser);
 
 async function parseHomework(title, ctx, next) {
-  // TODO
+  let homework = null;
+  try {
+    homework = await hwService.getOneHomework(title);
+  } catch (e) {
+    return handleError(ctx, e, 'DATABASE_QUERY_ERROR');
+  }
+  if (homework === null) {
+    return sendData(ctx, {}, 'NOT_FOUND', 'Homework not found', 404);
+  }
+  ctx.paramsData.homework = homework;
   await next();
 }
 
