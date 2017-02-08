@@ -2,18 +2,21 @@ const schema = {
   id: {  // login id
     type: String,
     required: true,
+    unique: true,
   },
   password: {
     type: String,
     required: true,
   },
   permission: {
-    type: String,
-    required: true,
+    type: Number,
+    default: 1,
+    min: 1,
+    max: 3,
   },
   nickname: {
     type: String,
-    required: true,
+    default: 'nickname',
   },
   github: {  // Github link
     type: String,
@@ -31,11 +34,26 @@ const schema = {
   },
   hw: {
     type: [{  // Homeworks
-      title: String,  // Homework's title
-      file: String,  // path to the file
+      title: {  // Homework's title
+        type: String,
+        required: true,
+      },
+      file: {  // path to the file
+        type: String,
+        required: true,
+      },
       comment: {  // comments
-        text: String,  // comment's content
-        author: String,  // who comment
+        type: [{
+          text: {  // comment's content
+            type: String,
+            required: true,
+          },
+          author: {  // who comments
+            type: String,
+            required: true,
+          },
+        }],
+        default: [],
       },
     }],
     default: [],

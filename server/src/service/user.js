@@ -2,15 +2,24 @@ const db = require('../models');
 
 const user = db.user;
 
-async function createUser(newUser) {
+async function createOneUser(newUser) {
   return user.create(newUser);
 }
 
-async function findUserById(id) {
-  return user.findOne({ id }).exec();
+async function getOneUser(id) {
+  return user.findOne({ id, deleted: false }).exec();
+}
+
+async function updateOneUser(id, newUser) {
+  return user.update(
+    { id, deleted: false },
+    { $set: newUser },
+    { runValidators: true }
+  ).exec();
 }
 
 module.exports = {
-  createUser,
-  findUserById,
+  createOneUser,
+  getOneUser,
+  updateOneUser,
 };
