@@ -26,7 +26,11 @@ async function init() {
 
   app.use(controller());
 
-  app.on('error', (err, ctx) => handleError(ctx, err));
+  app.on('error', (err, ctx) => {
+    handleError(ctx, err);
+    err.expose = process.env.NODE_ENV !== 'production';
+    err.message = err.stack;
+  });
 
   app.listen(config.port, () => {
     serverStarted = true;

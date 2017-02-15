@@ -13,8 +13,8 @@ async function requireLogin(ctx, next) {
 }
 
 async function requireAdmin(ctx, next) {
-  if (ctx.session.user.permission === 2) {  // 不知道是不是 2
-    return sendData(ctx, {}, 'NO_PERMISSION', 'Administrator authority required', 400);
+  if (ctx.session.user.permission !== 2) {  // 不知道是不是 2
+    return sendData(ctx, {}, 'NO_PERMISSION', 'Administrator authority required', 403);
   }
   await next();
 }

@@ -6,6 +6,7 @@ module.exports = {
   handleError,
   logRequest,
   recordAction,
+  isValidObjectId,
 };
 
 /**
@@ -18,10 +19,12 @@ module.exports = {
  * @param  {Number}    [statusCode]  HTTP 状态码, 默认 200
  * @author 陈宇翔
  */
-async function sendData(ctx, data, status = 'OK', msg = 'Success', statusCode = 200) {
+async function sendData(ctx, data = {}, status = 'OK', msg = 'Success', statusCode = 200) {
   let curUser = {};
-  if (ctx.session.user.permission) {
-    curUser = _.pick(ctx.session.user, ['id']);
+  const user = ctx.session.user;
+  if (user.permission) {
+    curUser = _.pick(user, ['username', 'nickname']);
+    curUser._id = String(user._id);
   }
   ctx.status = statusCode;
   ctx.body = {
@@ -35,7 +38,7 @@ async function sendData(ctx, data, status = 'OK', msg = 'Success', statusCode = 
 
 const statusToMsg = {
   DATABASE_QUERY_ERROR: 'Failed to execute query on database',
-  DATABASE_MODIFICATION_ERROR: 'Failed to perform insert or update on batabase',
+  DATABASE_UPDATE_ERROR: 'Failed to perform update on database',
 };
 
 /**
@@ -73,8 +76,8 @@ async function logRequest(ctx, next) {
   const elapsed = process.hrtime(start);
   const interval = `${(elapsed[0] * 1e3 + elapsed[1] / 1e6).toFixed(3)} ms`;
 
-  const { header: { 'content-length': contentLength }, method, url, ip, status } = ctx;
-  const statusText = (ctx.body && ` ${ctx.body.status}`) || '';
+  const { header: { 'content-length': contentLength }, body, method, url, ip, status } = ctx;
+  const statusText = (body && body.status && ` ${body.status}`) || '';
   const contentLengthText = (contentLength && ` - ${contentLength}`) || '';
   let func = 'info';
   if (status >= 400 && status < 500) {
@@ -86,6 +89,10 @@ async function logRequest(ctx, next) {
 }
 
 function recordAction(ctx, actionMsg) {
-  const { id } = ctx.session.user;
-  debug.info(`用户 ${id} ${actionMsg}`);
+  const { username } = ctx.session.user;
+  debug.info(`用户 ${username || ctx.ip} ${actionMsg}`);
+}
+
+function isValidObjectId(_id) {
+  return _id.length === 24 && !Number.isNaN(parseInt(_id, 16));
 }

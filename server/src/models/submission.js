@@ -1,21 +1,27 @@
 const ObjectId = require('mongoose').Schema.Types.ObjectId;
 
 const schema = {
-  title: {
-    type: String,
+  hwId: {
+    type: ObjectId,
+    ref: 'homework',
     required: true,
   },
-  description: {
+  author: {
+    type: ObjectId,
+    ref: 'user',
+    required: true,
+  },
+  createdTime: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedTime: {
+    type: Date,
+    default: null,
+  },
+  filename: {
     type: String,
-    default: '',
-  },
-  beginTime: {
-    type: Date,
-    default: null,
-  },
-  endTime: {
-    type: Date,
-    default: null,
+    required: true,
   },
   comments: {
     type: [{
@@ -24,8 +30,11 @@ const schema = {
     }],
     default: [],
   },
-  attachments: {
-    type: [String],
+  feedbacks: {
+    type: [{
+      type: ObjectId,
+      ref: 'comment',
+    }],
     default: [],
   },
   deleted: {
