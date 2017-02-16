@@ -40,7 +40,7 @@ title        | String           | homework's title
 description  | String           | homework's description (+)
 beginTime    | Date             | when the homework begins (nullable) (+)
 endTime      | Date             | when the homework is due (nullable) (+)
-attachments  | Array [String]   | filename of attachments
+attachments  | Array [ObjectId] | ids of attachments
 comments     | Array [ObjectId] | ids of comments on the homework (+) (需要？)
 deleted      | Boolean          | is deleted
 
@@ -67,7 +67,7 @@ hwId         | ObjectId         | homework's id that the submission is belongs t
 author       | ObjectId         | the author's id
 createdTime  | Date             | when the submission is created
 updatedTime  | Date             | when the submission is updated
-filename     | String           | filename of the submission
+fileId       | ObjectId         | submission file id
 comments     | Array [ObjectId] | ids of comments on the submission (by all)
 feedbacks    | Array [ObjectId] | ids of feedbacks on the submission (by all)
 deleted      | Boolean          | is deleted
