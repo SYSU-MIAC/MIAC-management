@@ -27,6 +27,15 @@ const upload = multer({
   },
 });
 
+/* debug */
+hwRtr.get('/submission', getOneSubmission);
+async function getOneSubmission(ctx) {
+  const stream = await hwService.downloadOneFile(ctx, ctx.query.id);
+  if (!stream) return;
+  ctx.attachment('haha.txt');
+  ctx.body = stream;
+}
+
 hwRtr.post('/',
   authService.requireAdmin,
   upload.array('attachment', 10),
@@ -69,9 +78,13 @@ async function createOneHomework(ctx, next) {
   const { body, files } = ctx.request;
   if (!await isValidNewHomework(ctx, body)) return;
 
+  body.attachments = await hwService.uploadFiles(ctx, files);
+  if (!body.attachments) return;
+
+  debug.debug(body);
   let _doc = null;
   try {
-    _doc = await hwService.createOne(body, files);
+    _doc = await hwService.createOne(body);
   } catch (e) {
     return handleError(ctx, e, 'DATABASE_UPDATE_ERROR');
   }
@@ -88,6 +101,7 @@ const hwAvailableProps = [
   'beginTime',
   'endTime',
   'comments',
+  'attachments',
 ];
 async function getOneHomework(ctx) {
   const { _id, title } = ctx.paramsData.homework;
@@ -95,7 +109,6 @@ async function getOneHomework(ctx) {
   recordAction(ctx, `查询作业 ${title} (_id = ${_id})`);
   return sendData(ctx, dataToSend, 'OK', 'Got homework information successfully');
 }
-
 
 async function deleteOneHomework(ctx) {
   const { _id, title } = ctx.paramsData.homework;
@@ -119,10 +132,14 @@ async function handInOneHomework(ctx) {
 
   // 要提交的东西
   const { file } = ctx.request;
+  const fileId = await hwService.uploadOneFile(ctx, file);
+  if (!fileId) return;
+
   const newSub = {
     hwId,
     author,
     filename: file.originalname,
+    fileId,
   };
 
   let _doc = null;

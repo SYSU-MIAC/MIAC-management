@@ -17,4 +17,6 @@ Object.keys(models).forEach((item) => {
   db[item] = mongoose.model(item, new mongoose.Schema(models[item].default));
 });
 
+require('./file')(db);
+
 module.exports = db;

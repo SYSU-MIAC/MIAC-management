@@ -19,14 +19,16 @@ const schema = {
     type: Date,
     default: null,
   },
-  filename: {
-    type: String,
+  fileId: {
+    type: ObjectId,
+    ref: 'File',
     required: true,
   },
   comments: {
     type: [{
       type: ObjectId,
       ref: 'comment',
+      required: true,
     }],
     default: [],
   },
@@ -34,6 +36,7 @@ const schema = {
     type: [{
       type: ObjectId,
       ref: 'comment',
+      required: true,
     }],
     default: [],
   },

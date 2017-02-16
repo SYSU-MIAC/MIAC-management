@@ -37,7 +37,7 @@ async function deleteOne(_id) {
 
 async function updateOne(_id, newSub) {
   Object.assign(newSub, { updatedTime: null });
-  await submission.findOneAndUpdate(
+  return submission.update(
     { _id, deleted: false },
     { $set: newSub },
     { runValidators: true }

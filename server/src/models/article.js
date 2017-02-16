@@ -30,6 +30,7 @@ const schema = {
     type: [{
       type: ObjectId,
       ref: 'comment',
+      required: true,
     }],
     default: [],
   },

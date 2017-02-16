@@ -21,11 +21,16 @@ const schema = {
     type: [{
       type: ObjectId,
       ref: 'comment',
+      required: true,
     }],
     default: [],
   },
   attachments: {
-    type: [String],
+    type: [{
+      type: ObjectId,
+      ref: 'File',
+      required: true,
+    }],
     default: [],
   },
   deleted: {

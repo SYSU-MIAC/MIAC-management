@@ -22,7 +22,6 @@
   "dependencies": {
     "bluebird": "^3.4.7",
     "bulk-require": "^1.0.0",
-    "gridfs-stream": "^1.1.1",
     "koa": "^2.0.0-alpha.5",
     "koa-bodyparser": "^3.2.0",
     "koa-compose": "^3.1.0",
@@ -35,6 +34,7 @@
     "lodash": "^4.17.4",
     "log4js": "^0.6.38",
     "mongoose": "^4.5.9",
+    "mongoose-gridfs": "^0.1.0",
     "nodemon": "^1.10.0"
   }
 }

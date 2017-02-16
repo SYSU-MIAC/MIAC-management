@@ -9,7 +9,7 @@ const user = db.user;
 async function getOne(_id) {
   return homework
     .findOne({ _id, deleted: false })
-    .populate('comments')
+    .populate('comments attachments')
     .exec();
 }
 
@@ -51,10 +51,32 @@ async function createOneFeedback(newComment) {
   return commentService.createOne(newComment);
 }
 
+async function uploadFiles(ctx, files) {
+  const filesInfo = files.map(({ originalname, buffer }) => ({
+    filename: originalname,
+    content: buffer,
+  }));
+  const result = await fileService.uploadBinaryFiles(ctx, filesInfo);
+  return result.map(({ _id }) => _id);
+}
+
+async function uploadOneFile(ctx, file) {
+  const ids = await uploadFiles(ctx, [file]);
+  if (!ids) return false;
+  return ids[0];
+}
+
+async function downloadOneFile(ctx, fileId) {
+  return fileService.downloadOneFile(ctx, fileId);
+}
+
 module.exports = {
   getOne,
   createOne,
   deleteOne,
   handInOne,
   createOneFeedback,
+  uploadFiles,
+  uploadOneFile,
+  downloadOneFile,
 };
