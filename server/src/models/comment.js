@@ -1,11 +1,12 @@
 const ObjectId = require('mongoose').Schema.Types.ObjectId;
 
 const schema = {
-  title: {
-    type: String,
+  author: {
+    type: ObjectId,
+    ref: 'user',
     required: true,
   },
-  content: {  // content
+  content: {
     type: String,
     required: true,
   },
@@ -17,22 +18,22 @@ const schema = {
     type: Date,
     default: null,
   },
-  author: {
-    type: ObjectId,
-    ref: 'user',
+  type: {
+    type: String,
     required: true,
   },
-  // username: {  // show in front end
-  //   type: String,
-  //   required: true,
-  // },
-  comments: {
-    type: [{
-      type: ObjectId,
-      ref: 'comment',
-      required: true,
-    }],
-    default: [],
+  ownerId: {
+    type: ObjectId,
+    refPath: 'type',
+    required: true,
+  },
+  details: {
+    type: {
+      isFeedback: {
+        type: Boolean,
+      },
+    },
+    default: {},
   },
   deleted: {
     type: Boolean,

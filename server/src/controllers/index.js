@@ -20,8 +20,8 @@ const apiRtr = new Router({
 init(apiRtr);
 
 module.exports = () => compose([
-  getBodyParser(),
   convert(getSession()),
+  getBodyParser(),
   apiRtr.routes(),
   apiRtr.allowedMethods(),
   serve(config.static),
@@ -29,6 +29,7 @@ module.exports = () => compose([
 
 function getBodyParser() {
   return bodyParser({
+    formLimit: '10mb',
     jsonLimit: '10mb',
     textLimit: '10mb',
     async onerror(err, ctx) {

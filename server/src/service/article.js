@@ -1,41 +1,47 @@
 const db = require('../models');
+const commentService = require('./comment');
 
 const article = db.article;
 
-async function createOneArticle(newArticle) {
-  return article.create(newArticle);
+async function getOne(_id) {
+  return article
+    .findOne({ _id, deleted: false })
+    .populate('comments')
+    .exec();
 }
 
-                              // articleId 是啥
-async function deleteOneArticle(articleId) {
-  return article.update(
-    { articleId, deleted: false },
+async function createOne(newArticle) {
+  Object.assign(newArticle, { createdTime: new Date() });
+  const { _doc } = await article.create(newArticle);
+  return _doc;
+}
+
+async function deleteOne(_id) {
+  const { _doc } = article.findOneAndUpdate(
+    { _id, deleted: false },
     { $set: { deleted: true } },
     { runValidators: true }
   ).exec();
+  return _doc;
 }
 
-async function getOneArticle(articleId) {
-  return article.find({ articleId, deleted: false }).exec();
-}
-
-async function updateOneArticle(articleId, newArticle) {
-  Object.assign(newArticle, { date: new Date() });
+async function updateOne(_id, newArticle) {
+  Object.assign(newArticle, { updatedTime: new Date() });
   return article.update(
-    { articleId, deleted: false },
+    { _id, deleted: false },
     { $set: newArticle },
     { runValidators: true }
   ).exec();
 }
 
-async function commentOnArticle() {
-  // TODO
+async function createOneComment(newComment) {
+  return commentService.createOne(newComment);
 }
 
 module.exports = {
-  createOneArticle,
-  deleteOneArticle,
-  getOneArticle,
-  updateOneArticle,
-  commentOnArticle,
+  getOne,
+  createOne,
+  deleteOne,
+  updateOne,
+  createOneComment,
 };

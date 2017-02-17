@@ -1,7 +1,12 @@
 const Router = require('koa-router');
 const crypto = require('crypto');
 const _ = require('lodash');
-const { sendData, handleError, recordAction } = require('../utils');
+const {
+  sendData,
+  handleError,
+  recordAction,
+  isValidObjectId,
+} = require('../utils');
 const { debug, error } = require('../utils/logger');
 const userService = require('../service/user');
 const authService = require('../service/authorization');
@@ -13,9 +18,9 @@ const userRtr = new Router({
 userRtr.post('/', authService.requireAdmin, createOneUser);
 userRtr.get('/login', login);
 userRtr.get('/logout', authService.requireLogin, logout);
-userRtr.param('id', parseUser);
-userRtr.get('/:id', getOneUser);
-userRtr.put('/:id', authService.requireLogin, updateOneUser);
+userRtr.param('_id', parseUser);
+userRtr.get('/:_id', getOneUser);
+userRtr.put('/:_id', authService.requireLogin, updateOneUser);
 
 function getMD5(data) {
   return crypto.createHash('md5').update(data).digest('hex');
@@ -29,31 +34,34 @@ async function removeLoginSession(ctx) {
   ctx.session.user = { permission: 0 };
 }
 
-async function parseUser(id, ctx, next) {
-  // TODO: id 合法性检验
+async function parseUser(_id, ctx, next) {
+  if (!isValidObjectId(_id)) {
+    return sendData(ctx, {}, 'INVALID_VALUE', 'Invalid user id', 400);
+  }
   let user = null;
   try {
-    user = await userService.getOneUser(id);
+    user = await userService.getOne(_id);
   } catch (e) {
     return handleError(ctx, e, 'DATABASE_QUERY_ERROR');
   }
   if (user === null) {
     return sendData(ctx, {}, 'NOT_FOUND', 'User not found', 404);
   }
-  ctx.paramsData.user = user;
+  ctx.paramsData.user = user._doc;
   await next();
 }
 
 const userAvailableProps = [
-  'id',
+  'username',
   'nickname',
   'email',
   'github',
   'permission',
+  'homeworks',
 ];
 async function getOneUser(ctx) {
   const dataToSend = _.pick(ctx.paramsData.user, userAvailableProps);
-  recordAction(ctx, `查询用户 ${ctx.paramsData.user.id} 的信息`);
+  recordAction(ctx, `查询用户 ${ctx.paramsData.user.username}`);
   return sendData(ctx, dataToSend, 'OK', 'Got user information successfully');
 }
 
@@ -61,10 +69,10 @@ async function login(ctx) {
   await removeLoginSession(ctx);
   if (!isValidReq(ctx.query)) return;
 
-  const { id, password } = ctx.query;
+  const { username, password } = ctx.query;
   let user = null;
   try {
-    user = await userService.getOneUser(id);
+    user = await userService.getOneByUsername(username);
   } catch (e) {
     return handleError(ctx, e, 'DATABASE_QUERY_ERROR');
   }
@@ -80,18 +88,8 @@ async function login(ctx) {
   }
 
   function isValidReq(body) {
-    if (isEmpty('id')) {
-      sendData(ctx, {}, 'BAD_REQUEST', 'Id must not be empty', 400);
-      return false;
-    } else if (isEmpty('password')) {
-      sendData(ctx, {}, 'BAD_REQUEST', 'Password must not be empty', 400);
-      return false;
-    }
+    // TODO
     return true;
-
-    function isEmpty(propName) {
-      return !Reflect.hasOwnProperty.call(body, propName) || body[propName] === '';
-    }
   }
 }
 
@@ -105,11 +103,11 @@ async function handleCreateOrUpdateError(ctx, e) {
     // TODO
     return sendData(ctx, e, 'INVALID_VALUE', 'Invalid field value', 400);
   }
-  return handleError(ctx, e, 'DATABASE_MODIFICATION_ERROR');
+  return handleError(ctx, e, 'DATABASE_UPDATE_ERROR');
 }
 
 const fieldsOnCreateUser = [
-  'id',
+  'username',
   'password',
   'nickname',
   'github',
@@ -121,13 +119,15 @@ async function createOneUser(ctx) {
   if (!await isValidNewUser(ctx, newUser)) return;
 
   refactorUser(newUser);
+  let _doc = null;
   try {
-    await userService.createOneUser(newUser);
+    _doc = await userService.createOne(newUser);
   } catch (e) {
     return handleCreateOrUpdateError(ctx, e);
   }
-  recordAction(ctx, '注册');
-  return sendData(ctx, {}, 'OK', 'Registered successfully');
+  const { _id, username } = _doc;
+  recordAction(ctx, `注册用户 ${username} (_id = ${_id})`);
+  return sendData(ctx, { _id }, 'OK', 'Registered successfully');
 
   function refactorUser(user) {
     user.permission = 1;
@@ -138,14 +138,13 @@ async function createOneUser(ctx) {
 async function logout(ctx) {
   recordAction(ctx, '登出');
   await removeLoginSession(ctx);
-  return sendData(ctx, {});
+  return sendData(ctx, {}, 'OK', 'Logged out successfully');
 }
 
 const fieldsOnUpdateUser = [
   'password',
   'nickname',
   'github',
-  'headimg',
   'email',
 ];
 async function updateOneUser(ctx) {
@@ -153,24 +152,25 @@ async function updateOneUser(ctx) {
 
   if (!await isValidNewUser(ctx, newUser)) return;
 
-  if (Reflect.hasOwnProperty.call(newUser, 'password')) {
+  if (newUser.hasOwnProperty('password')) {
     newUser.password = getMD5(newUser.password);
   }
-  const { id } = ctx.paramsData.user;
-  if (id !== ctx.session.user.id) {
-    return sendData(ctx, {}, 'NO_PERMISSION', `You are not ${id}`, 400);
+  const { _id, username } = ctx.paramsData.user;
+
+  if (String(_id) !== String(ctx.session.user._id)) {
+    return sendData(ctx, {}, 'NO_PERMISSION', `You are not ${username}`, 403);
   }
 
   let result = null;
   try {
-    result = await userService.updateOneUser(id, newUser);
+    result = await userService.updateOne(_id, newUser);
   } catch (e) {
     return handleCreateOrUpdateError(ctx, e);
   }
 
   if (result.n !== 1) {
     return sendData(ctx, {}, 'UPDATE_FAILURE', 'Failed to update the user', 500);
-  } else if (result.nModifited !== 1) {
+  } else if (result.nModified !== 1) {
     return sendData(ctx, {}, 'NOT_MODIFIED', 'User not modified', 200);
   }
   recordAction(ctx, '更新用户信息');
