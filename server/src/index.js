@@ -2,6 +2,7 @@ const Koa = require('koa');
 const config = require('./config');
 const controller = require('./controllers');
 const { debug, error } = require('./utils/logger');
+const { handleError, logRequest } = require('./utils');
 
 const app = new Koa();
 
@@ -9,23 +10,26 @@ let serverStarted = false;
 
 // emitted whenever a Promise is rejected and no error handler
 process.on('unhandledRejection', (reason, p) => {
-  error.error(`Catch Rejection : ${reason}\n${p}`);
+  error.error(`Uncaught Rejection : ${reason}`);
   if (!serverStarted) {
     // 如果服务器还没完成初始化则直接退出
     process.exit(1);
   }
 });
 
-process.on('uncaughtException', (err) => {
-  error.error(`Caught exception: ${err.stack}`);
+process.on('uncaughtException', (e) => {
+  error.error('Uncaught exception :', e);
 });
 
 async function init() {
+  app.use(logRequest);
+
   app.use(controller());
 
   app.on('error', (err, ctx) => {
-    error.error(err);
-    ctx.response.status = 500;
+    handleError(ctx, err);
+    err.expose = process.env.NODE_ENV !== 'production';
+    err.message = err.stack;
   });
 
   app.listen(config.port, () => {
