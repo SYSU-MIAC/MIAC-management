@@ -7,6 +7,8 @@ import Router from './router'
 import 'muse-ui/dist/muse-ui.css'
 import 'muse-ui/dist/theme-carbon.css'
 
+import 'animate.css'
+
 Vue.use(MuseUI)
 Vue.use(VueResource)
 
