@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
   port: 3000,
-  static: path.join(__dirname, '..', '..', '..', 'client/dist'),
+  static: path.join(__dirname, '..', '..', '..', 'static'),
   db: {
     host: 'localhost',
     username: 'miac',
