@@ -316,6 +316,20 @@ paths:
     get:
       tags:
       - "user"
+      summary: "Get self login information"
+      description: ""
+      operationId: "getLoginUser"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/User"
+      x-swagger-router-controller: "User"
+    post:
+      tags:
+      - "user"
       summary: "Logs user into the system"
       description: ""
       operationId: "loginUser"
@@ -323,12 +337,12 @@ paths:
       - "application/json"
       parameters:
       - name: "username"
-        in: "query"
+        in: "body"
         description: "The user name for login"
         required: true
         type: "string"
       - name: "password"
-        in: "query"
+        in: "body"
         description: "The password for login in encryted text"
         required: true
         type: "string"
