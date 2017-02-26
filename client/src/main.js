@@ -4,6 +4,8 @@ import MuseUI from 'muse-ui' // doc: https://museui.github.io
 import App from './App'
 import Router from './router'
 
+import 'animate.css'
+
 import 'muse-ui/dist/muse-ui.css'
 import 'muse-ui/dist/theme-carbon.css'
 
