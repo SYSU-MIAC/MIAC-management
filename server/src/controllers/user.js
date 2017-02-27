@@ -16,7 +16,8 @@ const userRtr = new Router({
 });
 
 userRtr.post('/', authService.requireAdmin, createOneUser);
-userRtr.get('/login', login);
+userRtr.get('/login', authService.requireLogin, getLogin);
+userRtr.post('/login', postLogin);
 userRtr.get('/logout', authService.requireLogin, logout);
 userRtr.param('_id', parseUser);
 userRtr.get('/:_id', getOneUser);
@@ -65,11 +66,17 @@ async function getOneUser(ctx) {
   return sendData(ctx, dataToSend, 'OK', 'Got user information successfully');
 }
 
-async function login(ctx) {
-  await removeLoginSession(ctx);
-  if (!isValidReq(ctx.query)) return;
+async function getLogin(ctx) {
+  const dataToSend = _.pick(ctx.session.user, ['_id', 'username', 'nickname', 'permission']);
+  recordAction(ctx, '查询自己的登录信息');
+  return sendData(ctx, dataToSend, 'OK', 'Got self login information successfully');
+}
 
-  const { username, password } = ctx.query;
+async function postLogin(ctx) {
+  await removeLoginSession(ctx);
+  if (!isValidReq(ctx.request.body)) return;
+
+  const { username, password } = ctx.request.body;
   let user = null;
   try {
     user = await userService.getOneByUsername(username);
